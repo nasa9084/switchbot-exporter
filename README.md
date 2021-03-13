@@ -27,4 +27,4 @@ scrape_configs:
 
 ## Limitation
 
-Due to [switchbot API's request limit](https://github.com/OpenWonderLabs/SwitchBotAPI#request-limit), cannot collect metrics whole a day
+[switchbot API's request limit](https://github.com/OpenWonderLabs/SwitchBotAPI#request-limit)
