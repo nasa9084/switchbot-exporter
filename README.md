@@ -1,5 +1,7 @@
 # switchbot-exporter
 
+**!!Currently only supports temperature/humidity comming from switchbot meter!!**
+
 ## Prometheus Configuration
 
 The switchbot exporter needs to be passed the target ID as a parameter, this can be done with relabelling (like blackbox exporter)
