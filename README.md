@@ -4,7 +4,7 @@
 
 ## Prometheus Configuration
 
-The switchbot exporter needs to be passed the target ID as a parameter, this can be done with relabelling (like blackbox exporter)
+The switchbot exporter needs to be passed the target ID as a parameter, this can be done with relabelling (like [blackbox exporter](https://github.com/prometheus/blackbox_exporter))
 
 Example Config:
 
@@ -24,3 +24,7 @@ scrape_configs:
       - target_label: __address__
         replacement: 127.0.0.1:8080 # The switchbot exporter's real ip/port
 ```
+
+## Limitation
+
+Due to [switchbot API's request limit](https://github.com/OpenWonderLabs/SwitchBotAPI#request-limit), cannot collect metrics whole a day
