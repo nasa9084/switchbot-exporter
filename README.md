@@ -11,6 +11,7 @@ Example Config:
 ``` yaml
 scrape_configs:
   - job_name: 'switchbox'
+    scrape_interval: 5m # not to reach API rate limit
     metrics_path: /metrics
     static_configs:
       - targets:
