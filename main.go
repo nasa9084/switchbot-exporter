@@ -36,6 +36,11 @@ func main() {
 }
 
 func run() error {
+	openTokenFromEnv := os.Getenv("SWITCHBOT_OPENTOKEN")
+	if openTokenFromEnv != "" {
+		*openToken = openTokenFromEnv
+	}
+
 	if *openToken == "" {
 		return errors.New("-switchbot.open-token is required")
 	}
