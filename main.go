@@ -19,6 +19,7 @@ import (
 var (
 	listenAddress = flag.String("web.listen-address", ":8080", "The address to listen on for HTTP requests")
 	openToken     = flag.String("switchbot.open-token", "", "The open token for switchbot-api")
+	secretKey     = flag.String("switchbot.secret-key", "", "The secret key for switchbot-api")
 )
 
 // deviceLabels is global cache gauge which stores device id and device name as its label.
@@ -45,7 +46,16 @@ func run() error {
 		return errors.New("-switchbot.open-token is required")
 	}
 
-	sc := switchbot.New(*openToken)
+	secretKeyFromEnv := os.Getenv("SWITCHBOT_SECRETKEY")
+	if secretKeyFromEnv != "" {
+		*secretKey = secretKeyFromEnv
+	}
+
+	if *secretKey == "" {
+		return errors.New("-switchbot.secret-key is required")
+	}
+
+	sc := switchbot.New(*openToken, *secretKey)
 
 	if err := reloadDevices(sc); err != nil {
 		return err
