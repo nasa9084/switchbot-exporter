@@ -116,7 +116,7 @@ func run() error {
 		}
 
 		switch status.Type {
-		case switchbot.Meter:
+		case switchbot.Meter, switchbot.MeterPlus:
 			meterHumidity := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 				Namespace: "switchbot",
 				Subsystem: "meter",
