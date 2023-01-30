@@ -134,6 +134,23 @@ func run() error {
 
 			meterHumidity.WithLabelValues(status.ID).Set(float64(status.Humidity))
 			meterTemperature.WithLabelValues(status.ID).Set(status.Temperature)
+		case switchbot.PlugMiniJP:
+			plugWeight := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+				Namespace: "switchbot",
+				Subsystem: "plug",
+				Name:      "weight",
+			}, []string{"device_id"})
+
+			plugVoltage := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+				Namespace: "switchbot",
+				Subsystem: "plug",
+				Name:      "voltage",
+			}, []string{"device_id"})
+
+			registry.MustRegister(deviceLabels)
+			registry.MustRegister(plugWeight, plugVoltage)
+			plugWeight.WithLabelValues(status.ID).Set(status.Weight)
+			plugVoltage.WithLabelValues(status.ID).Set(status.Voltage)
 		}
 
 		promhttp.HandlerFor(registry, promhttp.HandlerOpts{}).ServeHTTP(w, r)
