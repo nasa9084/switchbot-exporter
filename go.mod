@@ -9,3 +9,7 @@ require (
 	github.com/prometheus/client_golang v1.14.0
 	golang.org/x/sys v0.3.0 // indirect
 )
+
+replace (
+	github.com/nasa9084/go-switchbot v1.0.0 => github.com/bootjp/go-switchbot latest
+)
