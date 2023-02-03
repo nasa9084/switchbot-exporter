@@ -1,6 +1,6 @@
 module github.com/nasa9084/switchbot-exporter
 
-go 1.15
+go 1.19
 
 require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
