@@ -1,6 +1,16 @@
 # switchbot-exporter
 
-**!!Currently only supports temperature/humidity comming from switchbot meter!!**
+## Supported Devices / Metrics
+
+* Meter
+  * humidity
+  * temperature
+* Meter Plus
+  * humidity
+  * temperature
+* Plug Mini (JP)
+  * weight
+  * voltage
 
 ## Prometheus Configuration
 
