@@ -156,10 +156,8 @@ github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3Rllmb
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
 github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
-github.com/nasa9084/go-switchbot/v2 v2.0.1 h1:jSpAhqyTfqr7fXB/DSd6ap8l9pRzE0NLmXjvlAMlIVE=
-github.com/nasa9084/go-switchbot/v2 v2.0.1/go.mod h1:/BhZWClJhZFyyK1Uql10HcLM3YdbP6vVjucynAZHGDo=
-github.com/nasa9084/go-switchbot/v2 v2.1.0 h1:3gz8sIh7O1GCBjqsY7bL+JIOf56x7aJCYpfb4CdFwLw=
-github.com/nasa9084/go-switchbot/v2 v2.1.0/go.mod h1:/BhZWClJhZFyyK1Uql10HcLM3YdbP6vVjucynAZHGDo=
+github.com/nasa9084/go-switchbot/v3 v3.0.0 h1:h2nA0rzm9LhedknOpzUGNDXu77dhrN0sDVueEeigYoY=
+github.com/nasa9084/go-switchbot/v3 v3.0.0/go.mod h1:hrZUTHehZjib+vOCk9Rik5xvKQJ0KZKDOmyiIzonlI4=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
