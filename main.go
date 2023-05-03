@@ -147,10 +147,17 @@ func run() error {
 				Name:      "voltage",
 			}, []string{"device_id"})
 
+			plugElectricCurrent := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+				Namespace: "switchbot",
+				Subsystem: "plug",
+				Name:      "electricCurrent",
+			}, []string{"device_id"})
+
 			registry.MustRegister(deviceLabels)
-			registry.MustRegister(plugWeight, plugVoltage)
+			registry.MustRegister(plugWeight, plugVoltage, plugElectricCurrent)
 			plugWeight.WithLabelValues(status.ID).Set(status.Weight)
 			plugVoltage.WithLabelValues(status.ID).Set(status.Voltage)
+			plugElectricCurrent.WithLabelValues(status.ID).Set(status.ElectricCurrent)
 		}
 
 		promhttp.HandlerFor(registry, promhttp.HandlerOpts{}).ServeHTTP(w, r)
