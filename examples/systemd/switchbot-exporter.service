@@ -1,0 +1,12 @@
+[Unit]
+Description=switchbot-exporter
+Documentation=https://github.com/nasa9084/switchbot-exporter#readme
+
+[Service]
+Restart=on-failure
+User=switchbot-exporter
+EnvironmentFile=/etc/default/switchbot-exporter
+ExecStart=/usr/sbin/switchbot-exporter -switchbot.open-token ${SWITCHBOT_OPEN_TOKEN} -switchbot.secret-key ${SWITCHBOT_SECRET_KEY} -web.listen-address ${WEB_LISTEN_ADDRESS}
+
+[Install]
+WantedBy=multi-user.target
