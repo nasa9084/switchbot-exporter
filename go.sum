@@ -162,6 +162,8 @@ github.com/nasa9084/go-switchbot/v3 v3.0.0 h1:h2nA0rzm9LhedknOpzUGNDXu77dhrN0sDV
 github.com/nasa9084/go-switchbot/v3 v3.0.0/go.mod h1:hrZUTHehZjib+vOCk9Rik5xvKQJ0KZKDOmyiIzonlI4=
 github.com/nasa9084/go-switchbot/v3 v3.0.1 h1:D8COfC+M5Y08qEJEMq0ZDucqORQSS06IlTTkpHQuiRY=
 github.com/nasa9084/go-switchbot/v3 v3.0.1/go.mod h1:hrZUTHehZjib+vOCk9Rik5xvKQJ0KZKDOmyiIzonlI4=
+github.com/nasa9084/go-switchbot/v3 v3.0.2 h1:iq8pKrfvLDVh+YaBvhINxirtZ411T41bFG9PoLyDhzU=
+github.com/nasa9084/go-switchbot/v3 v3.0.2/go.mod h1:hrZUTHehZjib+vOCk9Rik5xvKQJ0KZKDOmyiIzonlI4=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
