@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -27,6 +28,15 @@ var deviceLabels = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "switchbot",
 	Name:      "device",
 }, []string{"device_id", "device_name"})
+
+// from https://github.com/prometheus/common
+type LabelSet map[string]string
+
+// the type expected by the prometheus http service discovery
+type StaticConfig struct {
+	Targets []string `json:"targets"`
+	Labels  LabelSet `json:"labels"`
+}
 
 func main() {
 	flag.Parse()
@@ -85,6 +95,33 @@ func run() error {
 			}
 		}
 	}()
+
+	http.HandleFunc("/discover", func(w http.ResponseWriter, r *http.Request) {
+		devices, _, err := sc.Device().List(r.Context())
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to discover devices: %s", err), http.StatusInternalServerError)
+			return
+		}
+
+		data := make([]StaticConfig, len(devices))
+
+		for i, device := range devices {
+			staticConfig := StaticConfig{}
+			staticConfig.Targets = make([]string, 1)
+			staticConfig.Labels = make(LabelSet)
+
+			staticConfig.Targets[0] = device.ID
+			staticConfig.Labels["device_id"] = device.ID
+			staticConfig.Labels["device_name"] = device.Name
+			staticConfig.Labels["device_type"] = string(device.Type)
+
+			data[i] = staticConfig
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(data)
+	})
 
 	http.HandleFunc("/-/reload", func(w http.ResponseWriter, r *http.Request) {
 		if expectMethod := http.MethodPost; r.Method != expectMethod {
