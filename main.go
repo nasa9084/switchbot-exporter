@@ -109,6 +109,7 @@ func run() error {
 			return
 		}
 
+		log.Printf("getting device status: %s", target)
 		status, err := sc.Device().Status(r.Context(), target)
 		if err != nil {
 			log.Printf("getting device status: %v", err)
@@ -158,6 +159,8 @@ func run() error {
 			plugWeight.WithLabelValues(status.ID).Set(status.Weight)
 			plugVoltage.WithLabelValues(status.ID).Set(status.Voltage)
 			plugElectricCurrent.WithLabelValues(status.ID).Set(status.ElectricCurrent)
+		default:
+			log.Printf("unrecognized device type: %s", status.Type)
 		}
 
 		promhttp.HandlerFor(registry, promhttp.HandlerOpts{}).ServeHTTP(w, r)
@@ -191,6 +194,7 @@ func reloadDevices(sc *switchbot.Client) error {
 	if err != nil {
 		return fmt.Errorf("getting device list: %w", err)
 	}
+	log.Print("got device list")
 
 	for _, device := range devices {
 		deviceLabels.WithLabelValues(device.ID, device.Name).Set(0)
