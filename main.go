@@ -29,13 +29,10 @@ var deviceLabels = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Name:      "device",
 }, []string{"device_id", "device_name"})
 
-// from https://github.com/prometheus/common
-type LabelSet map[string]string
-
 // the type expected by the prometheus http service discovery
 type StaticConfig struct {
-	Targets []string `json:"targets"`
-	Labels  LabelSet `json:"labels"`
+	Targets []string          `json:"targets"`
+	Labels  map[string]string `json:"labels"`
 }
 
 func main() {
@@ -97,18 +94,35 @@ func run() error {
 	}()
 
 	http.HandleFunc("/discover", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("discovering devices...")
 		devices, _, err := sc.Device().List(r.Context())
 		if err != nil {
 			http.Error(w, fmt.Sprintf("failed to discover devices: %s", err), http.StatusInternalServerError)
 			return
 		}
+		log.Printf("discovered device count: %d", len(devices))
+
+		supportedDeviceTypes := make(map[switchbot.PhysicalDeviceType]struct{})
+		supportedDeviceTypes[switchbot.Meter] = struct{}{}
+		supportedDeviceTypes[switchbot.MeterPlus] = struct{}{}
+		supportedDeviceTypes[switchbot.Hub2] = struct{}{}
+		supportedDeviceTypes[switchbot.WoIOSensor] = struct{}{}
+		supportedDeviceTypes[switchbot.Humidifier] = struct{}{}
+		supportedDeviceTypes[switchbot.PlugMiniJP] = struct{}{}
 
 		data := make([]StaticConfig, len(devices))
 
 		for i, device := range devices {
+			_, deviceTypeIsSupported := supportedDeviceTypes[device.Type]
+			if !deviceTypeIsSupported {
+				log.Printf("ignoring device %s with unsupported type: %s", device.ID, device.Type)
+				continue
+			}
+
+			log.Printf("discovered device %s of type %s", device.ID, device.Type)
 			staticConfig := StaticConfig{}
 			staticConfig.Targets = make([]string, 1)
-			staticConfig.Labels = make(LabelSet)
+			staticConfig.Labels = make(map[string]string)
 
 			staticConfig.Targets[0] = device.ID
 			staticConfig.Labels["device_id"] = device.ID
@@ -152,6 +166,7 @@ func run() error {
 			log.Printf("getting device status: %v", err)
 			return
 		}
+		log.Printf("got device status: %s", target)
 
 		switch status.Type {
 		case switchbot.Meter, switchbot.MeterPlus, switchbot.Hub2, switchbot.WoIOSensor, switchbot.Humidifier:
