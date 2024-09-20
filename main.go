@@ -102,13 +102,14 @@ func run() error {
 		}
 		log.Printf("discovered device count: %d", len(devices))
 
-		supportedDeviceTypes := make(map[switchbot.PhysicalDeviceType]struct{})
-		supportedDeviceTypes[switchbot.Hub2] = struct{}{}
-		supportedDeviceTypes[switchbot.Humidifier] = struct{}{}
-		supportedDeviceTypes[switchbot.Meter] = struct{}{}
-		supportedDeviceTypes[switchbot.MeterPlus] = struct{}{}
-		supportedDeviceTypes[switchbot.PlugMiniJP] = struct{}{}
-		supportedDeviceTypes[switchbot.WoIOSensor] = struct{}{}
+		supportedDeviceTypes := map[switchbot.PhysicalDeviceType]struct{}{
+			switchbot.Hub2:       {},
+			switchbot.Humidifier: {},
+			switchbot.Meter:      {},
+			switchbot.MeterPlus:  {},
+			switchbot.PlugMiniJP: {},
+			switchbot.WoIOSensor: {},
+		}
 
 		data := make([]StaticConfig, len(devices))
 
