@@ -103,12 +103,14 @@ func run() error {
 		log.Printf("discovered device count: %d", len(devices))
 
 		supportedDeviceTypes := map[switchbot.PhysicalDeviceType]struct{}{
-			switchbot.Hub2:       {},
-			switchbot.Humidifier: {},
-			switchbot.Meter:      {},
-			switchbot.MeterPlus:  {},
-			switchbot.PlugMiniJP: {},
-			switchbot.WoIOSensor: {},
+			switchbot.Hub2:        {},
+			switchbot.Humidifier:  {},
+			switchbot.Meter:       {},
+			switchbot.MeterPlus:   {},
+			switchbot.MeterPro:    {},
+			switchbot.MeterProCO2: {},
+			switchbot.PlugMiniJP:  {},
+			switchbot.WoIOSensor:  {},
 		}
 
 		data := make([]StaticConfig, len(devices))
@@ -170,7 +172,7 @@ func run() error {
 		log.Printf("got device status: %s", target)
 
 		switch status.Type {
-		case switchbot.Meter, switchbot.MeterPlus, switchbot.Hub2, switchbot.WoIOSensor, switchbot.Humidifier:
+		case switchbot.Meter, switchbot.MeterPlus, switchbot.MeterPro, switchbot.Hub2, switchbot.WoIOSensor, switchbot.Humidifier:
 			meterHumidity := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 				Namespace: "switchbot",
 				Subsystem: "meter",
@@ -186,6 +188,31 @@ func run() error {
 			registry.MustRegister(deviceLabels) // register global device labels cache
 			registry.MustRegister(meterHumidity, meterTemperature)
 
+			meterHumidity.WithLabelValues(status.ID).Set(float64(status.Humidity))
+			meterTemperature.WithLabelValues(status.ID).Set(status.Temperature)
+		case switchbot.MeterProCO2:
+			meterCO2 := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+				Namespace: "switchbot",
+				Subsystem: "meter",
+				Name:      "CO2",
+			}, []string{"device_id"})
+
+			meterHumidity := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+				Namespace: "switchbot",
+				Subsystem: "meter",
+				Name:      "humidity",
+			}, []string{"device_id"})
+
+			meterTemperature := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+				Namespace: "switchbot",
+				Subsystem: "meter",
+				Name:      "temperature",
+			}, []string{"device_id"})
+
+			registry.MustRegister(deviceLabels) // register global device labels cache
+			registry.MustRegister(meterCO2, meterHumidity, meterTemperature)
+
+			meterCO2.WithLabelValues(status.ID).Set(float64(status.CO2))
 			meterHumidity.WithLabelValues(status.ID).Set(float64(status.Humidity))
 			meterTemperature.WithLabelValues(status.ID).Set(status.Temperature)
 		case switchbot.PlugMiniJP:
