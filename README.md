@@ -18,7 +18,9 @@ Supports weight and voltage for:
 
 ### Static Configuration
 
-The switchbot exporter needs to be passed the target ID as a parameter, this can be done with relabelling (like [blackbox exporter](https://github.com/prometheus/blackbox_exporter)).
+~The switchbot exporter needs to be passed the target ID as a parameter,~ this can be done with relabelling (like [blackbox exporter](https://github.com/prometheus/blackbox_exporter)).
+
+Note: you can just query `/metrics` endpoint without target parameter to get all supported device status with release v0.5.0
 
 Change the host:port in the relabel_configs `replacement` to the host:port where the exporter is listening.
 
