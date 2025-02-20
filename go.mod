@@ -1,6 +1,6 @@
 module github.com/nasa9084/switchbot-exporter
 
-go 1.19
+go 1.20
 
 require (
 	github.com/nasa9084/go-switchbot/v4 v4.0.1
