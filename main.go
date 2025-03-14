@@ -123,6 +123,8 @@ func run() error {
 	signal.Notify(term, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
+		log.Printf("listen on %s", *listenAddress)
+
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 			srvc <- err
 		}
@@ -205,12 +207,17 @@ func (h *Handler) Discover(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Metrics(w http.ResponseWriter, r *http.Request) {
+	log.Print("called /metrics")
+
 	registry := prometheus.NewRegistry()
 	var targets []string
 
 	if target := r.FormValue("target"); target != "" {
 		targets = []string{target}
+
+		log.Printf("target parameter is given: %s", target)
 	} else {
+		log.Print("target parameter is not given")
 		devices, _, err := h.switchbotClient.Device().List(r.Context())
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -261,6 +268,8 @@ func (h *Handler) Metrics(w http.ResponseWriter, r *http.Request) {
 	registry.MustRegister(meterHumidity, meterTemperature, meterCO2)
 	registry.MustRegister(plugWeight, plugVoltage, plugElectricCurrent)
 
+	log.Printf("will try to retrieve metrics for %d devices", len(targets))
+
 	for _, target := range targets {
 		log.Printf("getting device status: %s", target)
 		status, err := h.switchbotClient.Device().Status(r.Context(), target)
@@ -272,13 +281,19 @@ func (h *Handler) Metrics(w http.ResponseWriter, r *http.Request) {
 
 		switch status.Type {
 		case switchbot.Meter, switchbot.MeterPlus, switchbot.MeterPro, switchbot.Hub2, switchbot.WoIOSensor, switchbot.Humidifier:
+			log.Printf("device is a meter-ish device")
+
 			meterHumidity.WithLabelValues(status.ID).Set(float64(status.Humidity))
 			meterTemperature.WithLabelValues(status.ID).Set(status.Temperature)
 		case switchbot.MeterProCO2:
+			log.Print("device is a CO2 meter")
+
 			meterCO2.WithLabelValues(status.ID).Set(float64(status.CO2))
 			meterHumidity.WithLabelValues(status.ID).Set(float64(status.Humidity))
 			meterTemperature.WithLabelValues(status.ID).Set(status.Temperature)
 		case switchbot.PlugMiniJP:
+			log.Print("device is a plug mini")
+
 			plugWeight.WithLabelValues(status.ID).Set(status.Weight)
 			plugVoltage.WithLabelValues(status.ID).Set(status.Voltage)
 			plugElectricCurrent.WithLabelValues(status.ID).Set(status.ElectricCurrent)
