@@ -2,7 +2,7 @@ module github.com/nasa9084/switchbot-exporter
 
 go 1.21
 
-toolchain go1.24.1
+toolchain go1.24.2
 
 require (
 	github.com/nasa9084/go-switchbot/v5 v5.1.0
