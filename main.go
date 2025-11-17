@@ -292,7 +292,7 @@ func (h *Handler) Metrics(w http.ResponseWriter, r *http.Request) {
 			meterCO2.WithLabelValues(status.ID).Set(float64(status.CO2))
 			meterHumidity.WithLabelValues(status.ID).Set(float64(status.Humidity))
 			meterTemperature.WithLabelValues(status.ID).Set(status.Temperature)
-		case switchbot.PlugMiniJP:
+		case switchbot.PlugMiniJP, switchbot.PlugMiniUS, switchbot.PlugMiniEU:
 			log.Print("device is a plug mini")
 
 			plugWeight.WithLabelValues(status.ID).Set(status.Weight)
