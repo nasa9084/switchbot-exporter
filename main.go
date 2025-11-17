@@ -170,13 +170,14 @@ func (h *Handler) Discover(w http.ResponseWriter, r *http.Request) {
 
 	supportedDeviceTypes := map[switchbot.PhysicalDeviceType]struct{}{
 		switchbot.Hub2:        {},
+		switchbot.Hub3:        {},
 		switchbot.Humidifier:  {},
 		switchbot.Meter:       {},
 		switchbot.MeterPlus:   {},
 		switchbot.MeterPro:    {},
 		switchbot.MeterProCO2: {},
 		switchbot.PlugMiniJP:  {},
-		switchbot.WoIOSensor:  {},
+		switchbot.WoIOSensor:  {}, // outdoor sensor
 	}
 
 	data := make([]StaticConfig, len(devices))
@@ -280,7 +281,7 @@ func (h *Handler) Metrics(w http.ResponseWriter, r *http.Request) {
 		log.Printf("got device status: %s", target)
 
 		switch status.Type {
-		case switchbot.Meter, switchbot.MeterPlus, switchbot.MeterPro, switchbot.Hub2, switchbot.WoIOSensor, switchbot.Humidifier:
+		case switchbot.Meter, switchbot.MeterPlus, switchbot.MeterPro, switchbot.Hub2, switchbot.Hub3, switchbot.WoIOSensor, switchbot.Humidifier:
 			log.Printf("device is a meter-ish device")
 
 			meterHumidity.WithLabelValues(status.ID).Set(float64(status.Humidity))

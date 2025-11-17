@@ -17,6 +17,8 @@ github.com/nasa9084/go-switchbot/v5 v5.0.0 h1:GNgvYtbUVFz6KHpdCVjfpE51B+9NM369li
 github.com/nasa9084/go-switchbot/v5 v5.0.0/go.mod h1:o2hvx2sq92j8oaHrl5JYrWkxSAiXVCCEEIqmvqxqZus=
 github.com/nasa9084/go-switchbot/v5 v5.1.0 h1:93BQMHbLivnQhZ5bYopzfRm0wvT0tVQ/pR8P5Gbu8nw=
 github.com/nasa9084/go-switchbot/v5 v5.1.0/go.mod h1:o2hvx2sq92j8oaHrl5JYrWkxSAiXVCCEEIqmvqxqZus=
+github.com/nasa9084/go-switchbot/v5 v5.2.0 h1:EwxZfNB7Vy+AzqNpLlPejRIVCXOj5ntcpQ2PyVseOQY=
+github.com/nasa9084/go-switchbot/v5 v5.2.0/go.mod h1:o2hvx2sq92j8oaHrl5JYrWkxSAiXVCCEEIqmvqxqZus=
 github.com/prometheus/client_golang v1.20.5 h1:cxppBPuYhUnsO6yo/aoRol4L7q7UFfdm+bR9r+8l63Y=
 github.com/prometheus/client_golang v1.20.5/go.mod h1:PIEt8X02hGcP8JWbeHyeZ53Y/jReSnHgO035n//V5WE=
 github.com/prometheus/client_golang v1.21.1 h1:DOvXXTqVzvkIewV/CDPFdejpMCGeMcbGCQ8YOmu+Ibk=
