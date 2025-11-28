@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.25.4
 
 require (
-	github.com/nasa9084/go-switchbot/v5 v5.2.1
+	github.com/nasa9084/go-switchbot/v5 v5.3.0
 	github.com/prometheus/client_golang v1.23.2
 )
 
