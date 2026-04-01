@@ -16,6 +16,8 @@ github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 h1:C3w9PqII01/Oq
 github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822/go.mod h1:+n7T8mK8HuQTcFwEeznm/DIxMOiR9yIdICNftLE1DvQ=
 github.com/nasa9084/go-switchbot/v5 v5.2.1 h1:AgmUMKq5UiemBwcfKo0W91DZhDz9iPGvQqMyDBWXF6E=
 github.com/nasa9084/go-switchbot/v5 v5.2.1/go.mod h1:o2hvx2sq92j8oaHrl5JYrWkxSAiXVCCEEIqmvqxqZus=
+github.com/nasa9084/go-switchbot/v5 v5.3.0 h1:IbWmape0ah8ngdzlNW6u47UZvcQxP31v6sMSVuEU7f0=
+github.com/nasa9084/go-switchbot/v5 v5.3.0/go.mod h1:o2hvx2sq92j8oaHrl5JYrWkxSAiXVCCEEIqmvqxqZus=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/prometheus/client_golang v1.22.0 h1:rb93p9lokFEsctTys46VnV1kLCDpVZ0a/Y92Vm0Zc6Q=
