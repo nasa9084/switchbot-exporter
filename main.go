@@ -7,9 +7,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	switchbot "github.com/nasa9084/go-switchbot/v5"
@@ -27,9 +29,9 @@ var (
 var deviceLabels = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "switchbot",
 	Name:      "device",
-}, []string{"device_id", "device_name"})
+}, []string{"device_id", "device_name", "device_slug"})
 
-// the type expected by the prometheus http service discovery
+// StaticConfig is the type expected by the Prometheus HTTP service discovery.
 type StaticConfig struct {
 	Targets []string          `json:"targets"`
 	Labels  map[string]string `json:"labels"`
@@ -104,7 +106,9 @@ func run() error {
 	http.HandleFunc("/-/reload", func(w http.ResponseWriter, r *http.Request) {
 		if expectMethod := http.MethodPost; r.Method != expectMethod {
 			w.WriteHeader(http.StatusMethodNotAllowed)
-			fmt.Fprintf(w, "This endpoint requires a %s request.\n", expectMethod)
+			if _, err := fmt.Fprintf(w, "This endpoint requires a %s request.\n", expectMethod); err != nil {
+				log.Printf("writing method-not-allowed response: %v", err)
+			}
 			return
 		}
 
@@ -125,7 +129,7 @@ func run() error {
 	go func() {
 		log.Printf("listen on %s", *listenAddress)
 
-		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			srvc <- err
 		}
 	}()
@@ -150,10 +154,10 @@ func reloadDevices(sc *switchbot.Client) error {
 	log.Print("got device list")
 
 	for _, device := range devices {
-		deviceLabels.WithLabelValues(device.ID, device.Name).Set(0)
+		deviceLabels.WithLabelValues(device.ID, device.Name, strings.ToLower(device.Name)).Set(0)
 	}
 	for _, device := range infrared {
-		deviceLabels.WithLabelValues(device.ID, device.Name).Set(0)
+		deviceLabels.WithLabelValues(device.ID, device.Name, strings.ToLower(device.Name)).Set(0)
 	}
 
 	return nil
@@ -169,15 +173,16 @@ func (h *Handler) Discover(w http.ResponseWriter, r *http.Request) {
 	log.Printf("discovered device count: %d", len(devices))
 
 	supportedDeviceTypes := map[switchbot.PhysicalDeviceType]struct{}{
-		switchbot.Hub2:        {},
-		switchbot.Hub3:        {},
-		switchbot.Humidifier:  {},
-		switchbot.Meter:       {},
-		switchbot.MeterPlus:   {},
-		switchbot.MeterPro:    {},
-		switchbot.MeterProCO2: {},
-		switchbot.PlugMiniJP:  {},
-		switchbot.WoIOSensor:  {}, // outdoor sensor
+		switchbot.Hub2:          {},
+		switchbot.Hub3:          {},
+		switchbot.Humidifier:    {},
+		switchbot.Meter:         {},
+		switchbot.MeterPlus:     {},
+		switchbot.MeterPro:      {},
+		switchbot.MeterProCO2:   {},
+		switchbot.PlugMiniJP:    {},
+		switchbot.WoIOSensor:    {}, // outdoor sensor
+		switchbot.ContactSensor: {},
 	}
 
 	data := make([]StaticConfig, len(devices))
@@ -197,6 +202,7 @@ func (h *Handler) Discover(w http.ResponseWriter, r *http.Request) {
 		staticConfig.Targets[0] = device.ID
 		staticConfig.Labels["device_id"] = device.ID
 		staticConfig.Labels["device_name"] = device.Name
+		staticConfig.Labels["device_slug"] = strings.ToLower(device.Name)
 		staticConfig.Labels["device_type"] = string(device.Type)
 
 		data[i] = staticConfig
@@ -204,7 +210,34 @@ func (h *Handler) Discover(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(data)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		log.Printf("encoding discover response: %v", err)
+	}
+}
+
+func brightnessStateToFloat64(s switchbot.BrightnessState) float64 {
+	brightness, _ := s.AmbientBrightness()
+	switch brightness {
+	case switchbot.AmbientBrightnessDim:
+		return 0
+	case switchbot.AmbientBrightnessBright:
+		return 1
+	default:
+		return math.NaN() // unknown/unexpected value
+	}
+}
+
+func openStateToFloat64(s switchbot.OpenState) float64 {
+	switch s {
+	case switchbot.ContactClose:
+		return 0
+	case switchbot.ContactOpen:
+		return 1
+	case switchbot.ContactTimeoutNotClose:
+		return 2
+	default:
+		return math.NaN() // unknown/unexpected value
+	}
 }
 
 func (h *Handler) Metrics(w http.ResponseWriter, r *http.Request) {
@@ -243,11 +276,25 @@ func (h *Handler) Metrics(w http.ResponseWriter, r *http.Request) {
 		Subsystem: "meter",
 		Name:      "temperature",
 	}, []string{"device_id"})
+
 	meterCO2 := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "switchbot",
 		Subsystem: "meter",
 		Name:      "CO2",
 	}, []string{"device_id"})
+
+	contactOpen := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "switchbot",
+		Subsystem: "contactsensor",
+		Name:      "open",
+	}, []string{"device_id"})
+
+	contactBrightness := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "switchbot",
+		Subsystem: "contactsensor",
+		Name:      "brightness",
+	}, []string{"device_id"})
+
 	plugWeight := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "switchbot",
 		Subsystem: "plug",
@@ -267,6 +314,7 @@ func (h *Handler) Metrics(w http.ResponseWriter, r *http.Request) {
 	}, []string{"device_id"})
 
 	registry.MustRegister(meterHumidity, meterTemperature, meterCO2)
+	registry.MustRegister(contactOpen, contactBrightness)
 	registry.MustRegister(plugWeight, plugVoltage, plugElectricCurrent)
 
 	log.Printf("will try to retrieve metrics for %d devices", len(targets))
@@ -286,18 +334,27 @@ func (h *Handler) Metrics(w http.ResponseWriter, r *http.Request) {
 
 			meterHumidity.WithLabelValues(status.ID).Set(float64(status.Humidity))
 			meterTemperature.WithLabelValues(status.ID).Set(status.Temperature)
+
 		case switchbot.MeterProCO2:
 			log.Print("device is a CO2 meter")
 
 			meterCO2.WithLabelValues(status.ID).Set(float64(status.CO2))
 			meterHumidity.WithLabelValues(status.ID).Set(float64(status.Humidity))
 			meterTemperature.WithLabelValues(status.ID).Set(status.Temperature)
+
+		case switchbot.ContactSensor:
+			log.Printf("device is a contact sensor")
+
+			contactOpen.WithLabelValues(status.ID).Set(openStateToFloat64(status.OpenState))
+			contactBrightness.WithLabelValues(status.ID).Set(brightnessStateToFloat64(status.Brightness))
+
 		case switchbot.PlugMiniJP, switchbot.PlugMiniUS, switchbot.PlugMiniEU:
 			log.Print("device is a plug mini")
 
 			plugWeight.WithLabelValues(status.ID).Set(status.Weight)
 			plugVoltage.WithLabelValues(status.ID).Set(status.Voltage)
 			plugElectricCurrent.WithLabelValues(status.ID).Set(status.ElectricCurrent)
+
 		default:
 			log.Printf("unrecognized device type: %s", status.Type)
 		}
