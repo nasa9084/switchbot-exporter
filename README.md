@@ -14,6 +14,9 @@ Currently supports humidity and temperature for:
 Supports weight and voltage for:
 * Plug Mini (JP)
 
+Supports brightness and open/close state for:
+* Contact sensor
+
 ## Prometheus Configuration
 
 ### Static Configuration
