@@ -1,4 +1,4 @@
-FROM golang:1.26 AS build
+FROM golang:1.27 AS build
 COPY . .
 RUN GOPATH="" CGO_ENABLED=0 go build -o /switchbot_exporter
 
